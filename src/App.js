@@ -1,7 +1,8 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import logo from './logo.svg';
-import './styles/main.scss';
+import 'Styles/main.scss';
+
 import theme from './styles';
 
 function App() {
