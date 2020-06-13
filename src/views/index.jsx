@@ -1,21 +1,20 @@
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
-import logo from './logo.svg';
+import theme from 'Styles/';
+import logo from '../logo.svg';
 import 'Styles/main.scss';
 
-import theme from './styles';
-
-function App() {
+function MainView() {
   return (
     <ThemeProvider theme={theme}>
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <p>Weather Forecast default create react app</p>
+          <p>Weather forecast</p>
         </header>
       </div>
     </ThemeProvider>
   );
 }
 
-export default App;
+export default MainView;
