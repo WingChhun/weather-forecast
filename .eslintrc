@@ -1,0 +1,16 @@
+{
+  "extends": "react-app",
+  "rules": {
+    "dot-notation": "off",
+    "font-family-no-missing-generic-family-keyword": "off",
+    "no-shadow": "off",
+    "no-underscore-dangle": "warn",
+    "padding-line-between-statements": "off",
+    "import/no-extraneous-dependencies": "off",
+    // TODO: https://github.com/benmosher/eslint-plugin-import/issues/1174
+    "@typescript-eslint/camelcase": ["warn", { "allow": ["intuit_locale"] }],
+    "react/boolean-prop-naming": "warn",
+    "react/function-component-definition": "off",
+    "@typescript-eslint/no-empty-function": "off"
+  }
+}
