@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InputField component should render InputField 1`] = `
+<div
+  className="sc-AxjAm fJzPch"
+>
+  <div
+    className="sc-AxiKw Abliu"
+  >
+    
+  </div>
+  <input
+    className="sc-AxirZ kaexEG"
+    onBlur={[Function]}
+    onChange={[Function]}
+    onFocus={[Function]}
+    placeholder=""
+    type="text"
+    value=""
+  />
+</div>
+`;
