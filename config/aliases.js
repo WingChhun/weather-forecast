@@ -8,6 +8,7 @@ module.exports = {
   Hooks: path.resolve(`${__dirname}/../`, 'src/hooks'),
   Fetches: path.resolve(`${__dirname}/../`, 'src/fetches'),
   Styles: path.resolve(`${__dirname}/../`, 'src/styles'),
+  Assets: path.resolve(`${__dirname}/../`, 'src/styles/assets'),
   Utilities: path.resolve(`${__dirname}/../`, 'src/utils'),
   Views: path.resolve(`${__dirname}/../`, 'src/views'),
 };
