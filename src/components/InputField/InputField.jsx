@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import delve from 'dlv';
 import makeClass from 'clsx';
 import styled from 'styled-components';
 
@@ -21,7 +20,7 @@ const StyledInputField = styled.input`
   border-style: solid;
   border-width: 1px;
 
-  font-weight:${(props) => delve(props, 'theme.weight.regular', null)}
+  font-weight:${(props) => props.theme.weight.regular}
 
   font-size: 16px;
 
@@ -104,13 +103,12 @@ const InputField = (props) => {
         placeholder={placeholder}
         {...restProps}
       />
-      <StyledError>{errorMessage}</StyledError>
     </StyledInputContainer>
   );
 };
 
 InputField.defaultProps = {
-  labelText: 'Input Field',
+  labelText: '',
   placeholder: '',
   type: 'text',
   onBlur: () => {},
