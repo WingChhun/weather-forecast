@@ -63,6 +63,7 @@ function MainView() {
   const { state, dispatch } = useContext(WeatherContext);
   const [cityName, setCityName] = useState('');
   const [cityTitle, setCityTitle] = useState('');
+  const [timeSpan, setTimeSpan] = useState(null);
 
   const handleChangeEvent = useCallback((value) => setCityName(value), [setCityName]);
 
@@ -71,8 +72,20 @@ function MainView() {
   // Manually set city title; based on formatted repsonse from API
   useEffect(() => {
     const cityTitle = delve(stateData, 'city.name', null);
-
     setCityTitle(cityTitle);
+
+    /* get new timeSpan on state data change */
+
+    const list = delve(stateData, 'list', []);
+
+    if (list.length) {
+      const { cnt: count } = stateData;
+      const firstDate = new Date(list[0].date).toDateString();
+      const lastDate = new Date(list[count - 1].date).toDateString();
+
+      const span = `${firstDate} - ${lastDate}`;
+      setTimeSpan(span);
+    }
 
     /* reset window scroll position to top */
     window.scrollTo(0, 0);
@@ -165,22 +178,28 @@ function MainView() {
         cellRenderer: ({ cellData, index }) => {
           const [date, time] = new Date(cellData).toLocaleString().split(',');
 
-          return (
-            <Styled.DateCell>
-              <span>{date}</span>
-              &nbsp;
-              <span>{time}</span>
-            </Styled.DateCell>
-          );
+          return <Styled.DateCell>{cellData}</Styled.DateCell>;
         },
       },
       minTemp: {
         colLabel: 'Min. Temp',
         data: minTempData,
+        colRenderer: (colLabel) => {
+          return <Styled.TempCol onClick={handleClickSortDate}>{colLabel}</Styled.TempCol>;
+        },
+        cellRenderer: ({ cellData }) => {
+          return <Styled.TempCell>{cellData}</Styled.TempCell>;
+        },
       },
       maxTemp: {
         colLabel: 'Max Temp',
         data: maxTempData,
+        colRenderer: (colLabel) => {
+          return <Styled.TempCol onClick={handleClickSortDate}>{colLabel}</Styled.TempCol>;
+        },
+        cellRenderer: ({ cellData }) => {
+          return <Styled.TempCell>{cellData}</Styled.TempCell>;
+        },
       },
       description: {
         colLabel: 'Description',
@@ -232,7 +251,7 @@ function MainView() {
             <h5>Five Day Forecast</h5>
           </span>
           <span>
-            <p> 10 June - 15 June</p>
+            <p>From: {timeSpan}</p>
           </span>
           <span>
             <p>City : {showErrorSnag ? <Styled.Error>{error}</Styled.Error> : cityTitle}</p>
@@ -256,5 +275,4 @@ MainView.defaultProps = {};
 MainView.propTypes = {};
 
 export default compose(WeatherHOC, ThemeHOC)(MainView);
-
 /* eslint-enable */

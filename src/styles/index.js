@@ -6,7 +6,6 @@ const theme = {
   colors,
   weight,
   breakpoints,
-  border: '5px solid orange',
 };
 
 export default theme;

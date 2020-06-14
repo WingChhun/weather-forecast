@@ -10,15 +10,21 @@ export const MainViewContainer = styled.div`
   padding: 50px;
   flex-direction: column;
 
-  font-size: 30px;
-
   height: 100vh;
-  width: 100vw;
+  width: 100%;
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+    padding: 15px;
+    margin: 20px auto;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    padding: 8px;
+    margin: 20px auto;
+  }
 `;
 
 export const HeaderContainer = styled.div`
   width: 100%;
-
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
@@ -59,10 +65,14 @@ export const Searchbar = styled(InputField)`
     transition: all 0.3s ease;
     border: 2px solid ${(props) => props.theme.colors.primary};
   }
-`;
 
-export const SearchButton = styled.div`
-  border: 1px solid ${(props) => props.theme.colors.primary};
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    width: 100%;
+
+    & input:focus {
+      width: 100%;
+    }
+  }
 `;
 
 export const SearchbarContainer = styled.div`
@@ -72,6 +82,14 @@ export const SearchbarContainer = styled.div`
 
   align-items: flex-end;
   margin-bottom: 15px;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+    width: 275px;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    width: auto;
+  }
 `;
 
 export const Header = styled.div`
@@ -79,15 +97,44 @@ export const Header = styled.div`
   width: 100%;
   align-items: center;
   cursor: default;
-  & span:not(:first-child) {
+  & span {
     display: inline-block;
 
-    margin-left: 25px;
+    & h5 {
+      font-size: 22px;
+    }
+    & p {
+      font-weight: ${(props) => props.theme.weight.regular};
+      font-size: 16px;
+    }
+
+    &:not(:first-child) {
+      margin-left: 25px;
+
+      @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+        margin-left: 15px;
+      }
+    }
   }
 
-  & p {
-    font-weight: ${(props) => props.theme.weight.regular};
-    font-size: 16px;
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    flex-direction: column;
+    text-align: center;
+
+    & span {
+      display: block;
+      width: 100%;
+      margin: 0;
+      text-align: center;
+
+      & h5 {
+        font-size: 18px;
+      }
+
+      &:not(:first-child) {
+        margin: 0;
+      }
+    }
   }
 `;
 
@@ -104,9 +151,10 @@ export const DescriptionCell = styled.div`
   display: flex;
   align-items: center;
   white-space: nowrap;
+  width: 100%;
 
   justify-content: space-between;
-  max-width: 150px;
+  flex: 1 0 150px;
 
   & span:first-letter {
     text-transform: capitalize;
@@ -120,10 +168,35 @@ export const DescriptionCell = styled.div`
     height: 50px;
     width: auto;
   }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.md}) {
+    flex: 1 0 120px;
+    border: 1px solid red;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+    flex: 1 0 100px;
+    font-size: 12px;
+
+    & img {
+      height: 32px;
+    }
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    flex: 1 0 50px;
+    font-size: 10px;
+
+    & span {
+      white-space: normal;
+    }
+    & img {
+      height: 24px;
+    }
+  }
 `;
 
 export const DateCol = styled.div`
-  padding: 5px;
   &:hover {
     cursor: pointer;
     color: ${(props) => props.theme.colors.primary};
@@ -136,3 +209,7 @@ export const DateCol = styled.div`
 export const DateCell = styled.div`
   display: flex;
 `;
+
+export const TempCell = styled.div``;
+
+export const TempCol = styled.div``;
