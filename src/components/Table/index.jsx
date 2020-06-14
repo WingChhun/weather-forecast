@@ -1,33 +1,92 @@
 import React, { useMemo } from 'react';
-import PropTypes, { checkPropTypes } from 'prop-types';
+import PropTypes from 'prop-types';
 import delve from 'dlv';
 import styled from 'styled-components';
 
-const TableContainer = styled.table``;
+const TableContainer = styled.table`
+  height: 500px;
+  overflow-y: scroll;
 
-const TableBody = styled.div``;
+  width: 100%;
+  font-size: 14px;
+`;
+
+const TableBody = styled.tbody`
+  overflow-y: scroll;
+`;
 
 const TableBodyCell = styled.td`
-  min-width: 150px;
-  flex: 1;
+  flex: 1 0 180px;
+  width: auto;
+
+  text-align: left;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.md}) {
+    flex: 1 0 120px;
+    border: 1px solid red;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+    flex: 1 0 100px;
+    font-size: 12px;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    flex: 1 0 50px;
+    font-size: 10px;
+  }
 `;
 
 const TableHeader = styled.tr`
   display: flex;
   justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid ${(props) => props.theme.colors.gray};
 `;
 
 const TableHeaderCell = styled.th`
-  min-width: 150px;
+  flex: 1 0 180px;
+  width: auto;
   flex: 1;
+  text-align: left;
+  font-weight: ${(props) => props.theme.weight.demi};
+  padding: 5px;
+  align-self: center;
+  cursor: default;
+  color: ${(props) => props.theme.colors.tertiary};
+
+  @media (max-width: ${(props) => props.theme.breakpoints.md}) {
+    flex: 1 0 120px;
+    border: 1px solid red;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
+    flex: 1 0 100px;
+    font-size: 12px;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.xs}) {
+    flex: 1 0 50px;
+    font-size: 10px;
+  }
 `;
 
 const TableRow = styled.tr`
-  border: 1px solid red;
   width: 100%;
   display: flex;
   align-items: center;
   padding: 5px;
+  transition: all 0.3s ease;
+  border: 2.5px solid transparent;
+  border-radius: 15px;
+
+  &:hover {
+    transition: all 0.3s ease;
+
+    border: 2.5px solid ${(props) => props.theme.colors.primary};
+    cursor: pointer;
+    box-shadow: ${(props) => props.theme.colors.primary};
+  }
 `;
 const Table = (props) => {
   const { columns, cellCount, ...restProps } = props;
@@ -77,7 +136,7 @@ const Table = (props) => {
 
       return (
         <TableHeaderCell key={reactKey}>
-          {colRenderer ? colRenderer({ colRenderer, colLabel }) : colLabel}
+          {colRenderer ? colRenderer(colLabel) : colLabel}
         </TableHeaderCell>
       );
     });
@@ -134,7 +193,8 @@ const Table = (props) => {
   return (
     <TableContainer {...restProps}>
       <TableHeader>{columnCellsJsx}</TableHeader>
-      <tbody>{bodyCellsJsx}</tbody>
+
+      <TableBody>{bodyCellsJsx}</TableBody>
     </TableContainer>
   );
 };
@@ -149,27 +209,27 @@ Table.propTypes = {
   cellCount: PropTypes.number.isRequired,
   columns: PropTypes.shape({
     // date: {
-    //   headerValue: 'Date',
+    //   colLabel: 'Date',
     //   data: [],
-    //   headerRenderer: (props) => {},
+    //   colRenderer: (props) => {},
     //   cellRenderer: (props) => {},
     // },
     // minTemp: {
-    //   columnLabel: 'Min. Temp',
+    //   colLabel: 'Min. Temp',
     //   data: [],
-    //   headerRenderer: (props) => {},
+    //   colRenderer: (props) => {},
     //   cellRenderer: (props) => {},
     // },
     // maxTemp: {
-    //   columnLabel: 'Max Temp',
+    //   colLabel: 'Max Temp',
     //   data: [],
-    //   headerRenderer: (props) => {},
+    //   colRenderer: (props) => {},
     //   cellRenderer: (props) => {},
     // },
     // description: {
-    //   columnLabel: 'Description',
+    //   colLabel: 'Description',
     //   data: [],
-    //   headerRenderer: (props) => {},
+    //   colRenderer: (props) => {},
     //   cellRenderer: (props) => {},
     // },
   }),
