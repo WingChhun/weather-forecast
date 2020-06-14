@@ -48,6 +48,12 @@ const StyledLabel = styled.div`
   width: 100%;
 `;
 
+// TODO:
+const StyledError = styled.div`
+  border: 1px solid red;
+  color: ${(props) => props.theme.colors.error};
+`;
+
 /**
  * InputField component
  *
@@ -59,6 +65,7 @@ const InputField = (props) => {
     type,
     labelText,
     placeholder,
+    errorMessage,
     onBlur,
     onChange,
     onFocus,
@@ -97,6 +104,7 @@ const InputField = (props) => {
         placeholder={placeholder}
         {...restProps}
       />
+      <StyledError>{errorMessage}</StyledError>
     </StyledInputContainer>
   );
 };
@@ -109,6 +117,7 @@ InputField.defaultProps = {
   onChange: () => {},
   onFocus: () => {},
   value: '',
+  errorMessage: null,
 };
 InputField.propTypes = {
   className: PropTypes.string.isRequired,
@@ -119,6 +128,7 @@ InputField.propTypes = {
   onFocus: PropTypes.func,
   value: PropTypes.string,
   placeholder: PropTypes.string,
+  errorMessage: PropTypes.string,
 };
 
 export default InputField;
