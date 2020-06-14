@@ -23,7 +23,6 @@ const TableBodyCell = styled.td`
 
   @media (max-width: ${(props) => props.theme.breakpoints.md}) {
     flex: 1 0 120px;
-    border: 1px solid red;
   }
 
   @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
@@ -57,7 +56,6 @@ const TableHeaderCell = styled.th`
 
   @media (max-width: ${(props) => props.theme.breakpoints.md}) {
     flex: 1 0 120px;
-    border: 1px solid red;
   }
 
   @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
