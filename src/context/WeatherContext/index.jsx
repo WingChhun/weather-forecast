@@ -1,19 +1,35 @@
 import React, { useMemo, useReducer, createContext } from 'react';
+import PropTypes from 'prop-types';
 import { STATUS } from '../constants';
 
 const WeatherContext = createContext();
 
 const ACTION = Object.freeze({
-  SET_WEATHER_DATA: 'SET_WEATHER_DATA',
+  LOAD_FORECAST_DATA: 'LOAD_FORECAST_DATA',
+  SET_FORECAST_DATA: 'SET_FORECAST_DATA',
+  FAILED_FORECAST_DATA: 'FAILED_FORECAST_DATA',
 });
 
 function WeatherReducer(state, action) {
   switch (action.type) {
-    case ACTION.SET_WEATHER_DATA:
+    case ACTION.LOAD_FORECAST_DATA:
       return {
         ...state,
-        // TODO: make some kind of utility
+        status: STATUS.PENDING,
+      };
+    case ACTION.SET_FORECAST_DATA:
+      return {
+        ...state,
         data: action.data,
+        error: null,
+        status: STATUS.LOADED,
+      };
+    case ACTION.FAILED_FORECAST_DATA:
+      return {
+        ...state,
+        data: null,
+        error: action.data,
+        status: STATUS.FAILED,
       };
     default:
       return state;
@@ -37,4 +53,8 @@ function WeatherProvider({ children }) {
   return <WeatherContext.Provider value={value}>{children}</WeatherContext.Provider>;
 }
 
-export { WeatherContext, WeatherProvider };
+WeatherProvider.propTypes = {
+  children: PropTypes.oneOf([PropTypes.node, PropTypes.func]).isRequired,
+};
+
+export { WeatherContext, WeatherProvider, ACTION };
