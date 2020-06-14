@@ -1,47 +1,78 @@
-import React, { useContext, useCallback, useState } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useContext, useCallback, useState, useMemo } from 'react';
+import delve from 'dlv';
 import WeatherHOC from 'Containers/WeatherHOC';
 import ThemeHOC from 'Containers/ThemeHOC';
 import { WeatherContext, ACTION as WEATHER_ACTION } from 'Context/WeatherContext';
-import InputField from 'Components/InputField/';
-import compose from 'src/utils/compose';
-import logo from 'Assets/logo.svg';
-import SearchSrc from 'Assets/search.svg';
+import Card from 'Components/Card/';
+import Table from 'Components/Table/';
+import * as Styled from 'Views/styled';
 import { STATUS_CODE } from 'Fetches/constants';
 import getForecastWeather from 'Fetches/getForecastWeather';
+import { STATUS } from 'Context/constants';
+import compose from 'src/utils/compose';
 import 'Styles/main.scss';
 
-const MainViewContainer = styled.div`
-  margin: 25px auto;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+/**
+ * formatForecast Response
+ *  parse response of unneeded data
+ *
+ * @param {*} data
+ */
+const formatForecastResponse = (data) => {
+  /* Appends URL for weather icon provided by openweathermap */
+  const formatWeather = (weather) => {
+    return weather.map(({ icon, ...restProps }) => {
+      return {
+        icon: `http://openweathermap.org/img/w/${icon}.png`,
+        ...restProps,
+      };
+    });
+  };
+  /* eslint-disable */
+  const list =
+    data.list &&
+    data.list.map((listData) => {
+      let description = listData.weather && listData.weather[0].description;
 
-  & h2 {
-    font-size: 30px;
-  }
-`;
+      return {
+        date: delve(listData, 'dt_txt', ''),
+        snow: delve(listData, 'snow', null),
+        wind: delve(listData, 'wind', null),
+        rain: delve(listData, 'rain', null),
+        clouds: delve(listData, 'clouds', null),
+        minTemp: delve(listData, 'main.temp_min', null),
+        maxTemp: delve(listData, 'main.temp_max', null),
+        weather: formatWeather(delve(listData, 'weather', [])),
+        description,
+      };
+    });
+  /* eslint-enable */
 
-const SearchIcon = (props) => <img src={SearchSrc} alt="search icon" {...props} />;
+  return {
+    ...data,
+    list,
+  };
+};
 
-const StyledSearchIcon = styled(SearchIcon)`
-  border: 1px solid red;
-`;
-
-const StyledInputField = styled(InputField)``;
-
-const SearchButton = styled.div`
-  border: 1px solid ${(props) => props.theme.colors.primary};
-`;
 /**
  * MainView
  *
  */
 function MainView() {
-  const { dispatch } = useContext(WeatherContext);
+  const { state, dispatch } = useContext(WeatherContext);
   const [cityName, setCityName] = useState('');
+  const [cityTitle, setCityTitle] = useState('');
 
   const handleChangeEvent = useCallback((value) => setCityName(value), [setCityName]);
+
+  const { data: stateData, error, status } = state;
+
+  // Manually set city title; based on formatted repsonse from API
+  useEffect(() => {
+    const cityTitle = delve(stateData, 'city.name', null);
+
+    setCityTitle(cityTitle);
+  }, [stateData]);
 
   const onGetForecast = useCallback(
     (event) => {
@@ -70,8 +101,8 @@ function MainView() {
           /* Successful Request */
           if (forecastData.cod === STATUS_CODE.SUCCESS) {
             dispatch({
-              type: WEATHER_ACTION.SET_WEATHER_DATA,
-              data: forecastData,
+              type: WEATHER_ACTION.SET_FORECAST_DATA,
+              data: formatForecastResponse(forecastData),
             });
           }
         }
@@ -82,25 +113,119 @@ function MainView() {
     [dispatch, cityName],
   );
 
-  console.groupEnd(); // DEBUG
+  // TODO: on CLick date column will trigger sorting by date
+  const columns = useMemo(() => {
+    const dateData = [];
+    const minTempData = [];
+    const maxTempData = [];
+    const descriptionData = [];
+
+    /* Populate data arrays for each column */
+    if (stateData) {
+      const { list = [] } = stateData;
+      /* eslint-disable-next-line */
+      list.forEach(({ date, description, maxTemp, minTemp }) => {
+        dateData.push(date);
+        minTempData.push(minTemp);
+        maxTempData.push(maxTemp);
+        descriptionData.push(description);
+      });
+    }
+
+    return {
+      date: {
+        colLabel: 'Date',
+        data: dateData,
+        // TODO: create styled component container for each column
+        // colRenderer: (colLabel, cellData) => {
+        //   return (
+
+        //   );
+        // },
+        cellRenderer: ({ cellData, index }) => {
+          return cellData;
+        },
+      },
+      minTemp: {
+        colLabel: 'Min. Temp',
+        data: minTempData,
+        // colRenderer: (props) => {},
+        // cellRenderer: (props) => {},
+      },
+      maxTemp: {
+        colLabel: 'Max Temp',
+        data: maxTempData,
+        // colRenderer: (props) => {},
+        // cellRenderer: (props) => {},
+      },
+      description: {
+        colLabel: 'Description',
+        data: descriptionData,
+        // colRenderer: (props) => {},
+        cellRenderer: ({ cellData, index }) => {
+          // Super unsafe use delve
+          const weatherIcon = stateData.list[index].weather[0].icon;
+
+          // TODO: properly format this.
+          return (
+            <div
+              style={{
+                display: 'flex',
+                ['align-items']: 'center',
+              }}
+            >
+              {cellData}
+
+              <img src={weatherIcon} alt="icon" />
+            </div>
+          );
+        },
+      },
+    };
+  }, [stateData]);
+
+  /* render spinner */
+  const isLoading = status === STATUS.PENDING;
+  const cellCount = useMemo(() => {
+    return delve(stateData, 'cnt', null);
+  }, [stateData]);
 
   return (
-    <MainViewContainer>
-      <h2> Weather Forecast</h2>
-      <img src={logo} className="App-logo" alt="logo" />
+    <Styled.MainViewContainer>
+      <Styled.HeaderContainer>
+        <Styled.SearchbarContainer
+          style={{
+            border: '1px solid red',
+          }}
+        >
+          <Styled.Searchbar
+            id="city"
+            data-automation-id="city"
+            onChange={handleChangeEvent}
+            onKeyPress={onGetForecast}
+            placeholderText="Search for city..."
+          />
+          {isLoading ? <Styled.LoaderIcon /> : <Styled.SearchbarIcon />}
+        </Styled.SearchbarContainer>
 
-      <div>
-        <StyledSearchIcon />
-        <StyledInputField
-          id="city"
-          data-automation-id="city"
-          onChange={handleChangeEvent}
-          onKeyPress={onGetForecast}
-          labelText="City"
-        />
-        <SearchButton>Search</SearchButton>
-      </div>
-    </MainViewContainer>
+        <Styled.Header>
+          <h3>Forecast</h3>
+          <h3> 10 June - 15 June</h3>
+          {/* eslint-disable-next-line */}
+          <h4>City : {cityTitle}</h4>
+        </Styled.Header>
+      </Styled.HeaderContainer>
+
+      <Styled.BodyContainer>
+        <Card>
+          <Table
+            columns={columns}
+            cellCount={cellCount}
+            //  rowRenderer = {}
+          />
+        </Card>
+      </Styled.BodyContainer>
+    </Styled.MainViewContainer>
   );
 }
 

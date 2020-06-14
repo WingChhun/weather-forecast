@@ -10,6 +10,13 @@ const ACTION = Object.freeze({
   FAILED_FORECAST_DATA: 'FAILED_FORECAST_DATA',
 });
 
+/**
+ * Reducer in charge of updating Weather state
+ *
+ * @param {*} state
+ * @param {*} action
+ * @returns
+ */
 function WeatherReducer(state, action) {
   switch (action.type) {
     case ACTION.LOAD_FORECAST_DATA:
@@ -36,7 +43,14 @@ function WeatherReducer(state, action) {
   }
 }
 
+/**
+ * WeatherProvider; provides WeatherContext to wrapped components
+ *
+ * @param {*} { children }
+ * @returns
+ */
 function WeatherProvider({ children }) {
+  // TODO: create local storage hook, that has knowledge of when was the last time the user queried for the same city
   const [state, dispatch] = useReducer(WeatherReducer, {
     data: null,
     error: null,
