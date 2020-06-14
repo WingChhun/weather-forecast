@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useContext, useCallback, useState, useMemo } from 'react';
 import delve from 'dlv';
 import WeatherHOC from 'Containers/WeatherHOC';
@@ -72,48 +73,70 @@ function MainView() {
     const cityTitle = delve(stateData, 'city.name', null);
 
     setCityTitle(cityTitle);
+
+    /* reset window scroll position to top */
+    window.scrollTo(0, 0);
   }, [stateData]);
 
-  const onGetForecast = useCallback(
+  const getForecast = useCallback(async () => {
+    /* Start Loader */
+    dispatch({
+      type: WEATHER_ACTION.LOAD_FORECAST_DATA,
+    });
+
+    const forecastData = await getForecastWeather({
+      cityName,
+    });
+
+    /* Bad Request */
+    if (
+      forecastData.cod === STATUS_CODE.BAD_REQUEST ||
+      forecastData.cod === STATUS_CODE.NOT_FOUND
+    ) {
+      dispatch({
+        type: WEATHER_ACTION.FAILED_FORECAST_DATA,
+        data: forecastData.message || 'Bad request',
+      });
+    }
+
+    /* Successful Request */
+    if (forecastData.cod === STATUS_CODE.SUCCESS) {
+      dispatch({
+        type: WEATHER_ACTION.SET_FORECAST_DATA,
+        data: formatForecastResponse(forecastData),
+      });
+    }
+  }, [dispatch, getForecastWeather, cityName]);
+
+  const onKeypressGetForecast = useCallback(
     (event) => {
-      async function sendRequest() {
-        if (event.key === 'Enter') {
-          /* Start Loader */
-          dispatch({
-            type: WEATHER_ACTION.LOAD_FORECAST_DATA,
-          });
-
-          const forecastData = await getForecastWeather({
-            cityName,
-          });
-
-          /* Bad Request */
-          if (
-            forecastData.cod === STATUS_CODE.BAD_REQUEST ||
-            forecastData.cod === STATUS_CODE.NOT_FOUND
-          ) {
-            dispatch({
-              type: WEATHER_ACTION.FAILED_FORECAST_DATA,
-              data: forecastData.message || 'Bad request',
-            });
-          }
-
-          /* Successful Request */
-          if (forecastData.cod === STATUS_CODE.SUCCESS) {
-            dispatch({
-              type: WEATHER_ACTION.SET_FORECAST_DATA,
-              data: formatForecastResponse(forecastData),
-            });
-          }
-        }
+      if (event.key === 'Enter') {
+        getForecast();
       }
-
-      sendRequest();
     },
     [dispatch, cityName],
   );
 
-  // TODO: on CLick date column will trigger sorting by date
+  // TODO: sorting
+  /* Sort date on click: probably better if in local state*/
+  const handleClickSortDate = useCallback(() => {
+    const list = stateData.list && stateData.list;
+
+    const sorted = list.sort((a, b) => {
+      return b.date - a.date;
+    });
+
+    const updatedData = {
+      ...stateData,
+      list,
+    };
+
+    dispatch({
+      type: WEATHER_ACTION.SET_FORECAST_DATA,
+      data: updatedData,
+    });
+  }, [stateData]);
+
   const columns = useMemo(() => {
     const dateData = [];
     const minTempData = [];
@@ -126,8 +149,8 @@ function MainView() {
       /* eslint-disable-next-line */
       list.forEach(({ date, description, maxTemp, minTemp }) => {
         dateData.push(date);
-        minTempData.push(minTemp);
-        maxTempData.push(maxTemp);
+        minTempData.push(`${minTemp}°`);
+        maxTempData.push(`${maxTemp}°`);
         descriptionData.push(description);
       });
     }
@@ -136,48 +159,43 @@ function MainView() {
       date: {
         colLabel: 'Date',
         data: dateData,
-        // TODO: create styled component container for each column
-        // colRenderer: (colLabel, cellData) => {
-        //   return (
-
-        //   );
-        // },
+        colRenderer: (colLabel) => {
+          return <Styled.DateCol onClick={handleClickSortDate}>{colLabel}</Styled.DateCol>;
+        },
         cellRenderer: ({ cellData, index }) => {
-          return cellData;
+          const [date, time] = new Date(cellData).toLocaleString().split(',');
+
+          return (
+            <Styled.DateCell>
+              <span>{date}</span>
+              &nbsp;
+              <span>{time}</span>
+            </Styled.DateCell>
+          );
         },
       },
       minTemp: {
         colLabel: 'Min. Temp',
         data: minTempData,
-        // colRenderer: (props) => {},
-        // cellRenderer: (props) => {},
       },
       maxTemp: {
         colLabel: 'Max Temp',
         data: maxTempData,
-        // colRenderer: (props) => {},
-        // cellRenderer: (props) => {},
       },
       description: {
         colLabel: 'Description',
         data: descriptionData,
-        // colRenderer: (props) => {},
+
+        /* eslint-disable-next-line */
         cellRenderer: ({ cellData, index }) => {
           // Super unsafe use delve
-          const weatherIcon = stateData.list[index].weather[0].icon;
+          const weatherIcon = stateData.list && stateData.list[index].weather[0].icon;
 
-          // TODO: properly format this.
           return (
-            <div
-              style={{
-                display: 'flex',
-                ['align-items']: 'center',
-              }}
-            >
-              {cellData}
-
+            <Styled.DescriptionCell>
+              <span>{cellData}</span>
               <img src={weatherIcon} alt="icon" />
-            </div>
+            </Styled.DescriptionCell>
           );
         },
       },
@@ -186,6 +204,7 @@ function MainView() {
 
   /* render spinner */
   const isLoading = status === STATUS.PENDING;
+  const showErrorSnag = status === STATUS.FAILED;
   const cellCount = useMemo(() => {
     return delve(stateData, 'cnt', null);
   }, [stateData]);
@@ -193,37 +212,41 @@ function MainView() {
   return (
     <Styled.MainViewContainer>
       <Styled.HeaderContainer>
-        <Styled.SearchbarContainer
-          style={{
-            border: '1px solid red',
-          }}
-        >
+        <Styled.SearchbarContainer>
+          {isLoading ? (
+            <Styled.LoaderIcon />
+          ) : (
+            <Styled.SearchbarIcon id="search-icon" onClick={getForecast} />
+          )}
           <Styled.Searchbar
             id="city"
             data-automation-id="city"
             onChange={handleChangeEvent}
-            onKeyPress={onGetForecast}
-            placeholderText="Search for city..."
+            onKeyPress={onKeypressGetForecast}
+            placeholder="Search for city..."
           />
-          {isLoading ? <Styled.LoaderIcon /> : <Styled.SearchbarIcon />}
         </Styled.SearchbarContainer>
 
         <Styled.Header>
-          <h3>Forecast</h3>
-          <h3> 10 June - 15 June</h3>
-          {/* eslint-disable-next-line */}
-          <h4>City : {cityTitle}</h4>
+          <span>
+            <h5>Five Day Forecast</h5>
+          </span>
+          <span>
+            <p> 10 June - 15 June</p>
+          </span>
+          <span>
+            <p>City : {showErrorSnag ? <Styled.Error>{error}</Styled.Error> : cityTitle}</p>
+          </span>
         </Styled.Header>
       </Styled.HeaderContainer>
 
       <Styled.BodyContainer>
-        <Card>
-          <Table
-            columns={columns}
-            cellCount={cellCount}
-            //  rowRenderer = {}
-          />
-        </Card>
+        {isLoading && !stateData && <Styled.LoaderIcon />}
+        {stateData && !isLoading && (
+          <Card>
+            <Table columns={columns} cellCount={cellCount} />
+          </Card>
+        )}
       </Styled.BodyContainer>
     </Styled.MainViewContainer>
   );
@@ -233,3 +256,5 @@ MainView.defaultProps = {};
 MainView.propTypes = {};
 
 export default compose(WeatherHOC, ThemeHOC)(MainView);
+
+/* eslint-enable */

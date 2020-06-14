@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 const StyledCard = styled.div`
-  color: 1px solid #d4d7dc;
+  color: 1px solid ${(props) => props.theme.colors.boxShadow};
   border-radius: 3px;
-  box-shadow: 0 2px 4px 0 #d4d7dc;
+  box-shadow: 0 4px 8px 0 ${(props) => props.theme.colors.boxShadow};
 
-  padding: 15px 10px;
-
+  padding: 25px 15px;
+  border-radius: 15px;
   background-color: ${(props) => props.theme.colors.white};
 `;
 

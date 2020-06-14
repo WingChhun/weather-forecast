@@ -8,4 +8,6 @@ export default {
   tertiary: '#264653',
   warning: '#f4a261',
   error: '#e76f51',
+  boxShadow: '#d4d7dc',
+  backgroundColor: '#F1F4F6',
 };

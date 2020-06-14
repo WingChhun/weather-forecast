@@ -4,40 +4,43 @@ import makeClass from 'clsx';
 import styled from 'styled-components';
 
 const StyledInputContainer = styled.div`
-  border: 1px solid orange;
   display: flex;
   flex-direction: column;
   align-content: flex-start;
-
-  max-width: 185px;
+  min-width: 185px;
 `;
 
 const StyledInputField = styled.input`
   padding: 8px 4px;
-  border: 2px solid orange;
-  border-color: orange;
+  font-weight:${(props) => props.theme.weight.regular}
+  font-size: 16px;
   border-radius: 3px;
   border-style: solid;
   border-width: 1px;
-
-  font-weight:${(props) => props.theme.weight.regular}
-
-  font-size: 16px;
-
+  // border-bottom:2px solid transparent;
   height: 32px;
   line-height: 20px;
 
-  width: 100%;
+  width: ${(props) => props.width || '100%'};
   padding: 4px 8px;
+  transition: all .2s ease;
+outline:none;
+
+&:focus, &:hover {
+  outline:none;
+  border-bottom:2px solid ${(props) => props.theme.colors.primary}
+  transition: all .2s ease;
+
+}
 
   @media (max-width: 480px) {
     padding: 8px 10px;
   }
+
 `;
 
 const StyledLabel = styled.div`
-  border: 1px solid red;
-  color: @theme labelColor;
+  color: ${(props) => props.theme.colors.gray};
   font-size: 14px;
 
   height: 20px;
@@ -47,9 +50,7 @@ const StyledLabel = styled.div`
   width: 100%;
 `;
 
-// TODO:
 const StyledError = styled.div`
-  border: 1px solid red;
   color: ${(props) => props.theme.colors.error};
 `;
 
