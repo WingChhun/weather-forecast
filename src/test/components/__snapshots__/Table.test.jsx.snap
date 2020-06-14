@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Table component should render Tan empty table able 1`] = `
+<table
+  className="sc-AxjAm gCWdOK"
+>
+  <tr
+    className="sc-AxhCb eNSGAS"
+  />
+  <tbody
+    className="sc-AxirZ fLSXMS"
+  />
+</table>
+`;

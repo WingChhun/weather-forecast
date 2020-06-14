@@ -130,7 +130,7 @@ function MainView() {
     [dispatch, cityName],
   );
 
-  // TODO: sorting
+  // TODO: sort
   /* Sort date on click: probably better if in local state*/
   const handleClickSortDate = useCallback(() => {
     const list = stateData.list && stateData.list;
@@ -220,6 +220,9 @@ function MainView() {
       },
     };
   }, [stateData]);
+
+  console.log('columns:', columns);
+  console.log('columns:', JSON.stringify(columns));
 
   /* render spinner */
   const isLoading = status === STATUS.PENDING;
