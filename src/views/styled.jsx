@@ -171,7 +171,6 @@ export const DescriptionCell = styled.div`
 
   @media (max-width: ${(props) => props.theme.breakpoints.md}) {
     flex: 1 0 120px;
-    border: 1px solid red;
   }
 
   @media (max-width: ${(props) => props.theme.breakpoints.sm}) {
